@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Mother {
+  id                    String                  @id @default(cuid())
+  email                 String                  @unique
+  full_name             String
+  phone_number          String                  @unique
+  location              String
+  date_of_birth         DateTime
+  HealthSignsMonitoring HealthSignsMonitoring[]
+  Journals              JournalEntry[]
+  Appointments          Appointment[]
+  LabResults            LabResult[]
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model HealthSignsMonitoring {
+  id             String @id @default(cuid())
+  heart_rate     Int
+  blood_pressure String
+  o2_saturation  Int
+  stress_level   Int
+  Mother         Mother @relation(fields: [motherId], references: [id], onDelete: Cascade)
+  motherId       String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model JournalEntry {
+  id         String     @id @default(cuid())
+  mood       Mood
+  symptoms   String
+  nutritions Nutritions
+  notes      String
+  Mother     Mother     @relation(fields: [motherId], references: [id], onDelete: Cascade)
+  motherId   String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Appointment {
+  id               String   @id @default(cuid())
+  appointment_date DateTime
+  doctor_name      String
+  purpose          String
+  location         String
+  Mother           Mother   @relation(fields: [motherId], references: [id], onDelete: Cascade)
+  motherId         String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model LabResult {
+  id           String   @id @default(cuid())
+  test_name    String
+  result_value String
+  normal_range String
+  test_date    DateTime
+  Mother       Mother   @relation(fields: [motherId], references: [id], onDelete: Cascade)
+  motherId     String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model EducationResource {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  url         String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model StuntingEducation {
+  id          String @id @default(cuid())
+  title       String
+  description String
+  url         String
+
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+enum Mood {
+  HAPPY
+  SAD
+  ANXIOUS
+  NEUTRAL
+}
+
+enum Nutritions {
+  EXCELLENT
+  GOOD
+  FAIR
+  POOR
+}
